@@ -35,6 +35,9 @@ This document explains the changes made to Iris for this release
    non-existing paths, and added expansion functionality to :func:`~iris.io.save`.
    (:issue:`4772`, :pull:`4913`)
 
+#. `@wjbenfold`_ added `crs_wkt` to the attributes saved out to a netCDF file.
+   (:issue:`3796`, :pull:`4719`)
+
 
 🐛 Bugs Fixed
 =============
