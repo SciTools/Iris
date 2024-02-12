@@ -9,7 +9,6 @@ See also: :mod:`NumPy <numpy>`.
 """
 
 import re
-import warnings
 
 import cf_units
 import numpy as np
@@ -22,7 +21,7 @@ from iris.analysis.cartography import (
 import iris.analysis.maths
 import iris.coord_systems
 import iris.coords
-from iris.exceptions import IrisUserWarning
+from iris.exceptions import IrisUserWarning, warn_once_at_level
 from iris.util import delta
 
 __all__ = ["DIRECTIONAL_NAMES", "cube_delta", "curl", "differentiate"]
@@ -85,7 +84,7 @@ def _construct_midpoint_coord(coord, circular=None):
             "Construction coordinate midpoints for the '{}' coordinate, "
             "though it has the attribute 'circular'={}."
         )
-        warnings.warn(
+        warn_once_at_level(
             msg.format(circular, coord.circular, coord.name()),
             category=IrisUserWarning,
         )

@@ -7,13 +7,13 @@
 from abc import ABCMeta, abstractmethod
 from functools import cached_property
 import re
-import warnings
 
 import cartopy.crs as ccrs
 import numpy as np
 
 from iris._deprecation import warn_deprecated
 import iris.exceptions
+from iris.exceptions import warn_once_at_level
 
 
 def _arg_default(value, default, cast_as=float):
@@ -439,7 +439,7 @@ class GeogCS(CoordSystem):
             "the GeogCS object. To change other properties set them explicitly"
             " or create a new GeogCS instance."
         )
-        warnings.warn(wmsg, category=iris.exceptions.IrisUserWarning)
+        warn_once_at_level(wmsg, category=iris.exceptions.IrisUserWarning)
         value = float(value)
         self._inverse_flattening = value
 
@@ -765,7 +765,7 @@ class Orthographic(CoordSystem):
     def as_cartopy_crs(self):
         globe = self._ellipsoid_to_globe(self.ellipsoid, ccrs.Globe())
 
-        warnings.warn(
+        warn_once_at_level(
             "Discarding false_easting and false_northing that are "
             "not used by Cartopy.",
             category=iris.exceptions.IrisDefaultingWarning,

@@ -8,7 +8,6 @@ from functools import lru_cache
 import inspect
 import math
 import operator
-import warnings
 
 import cf_units
 import dask.array as da
@@ -22,6 +21,7 @@ from iris.common.lenient import _lenient_client
 from iris.config import get_logger
 import iris.coords
 import iris.exceptions
+from iris.exceptions import warn_once_at_level
 import iris.util
 
 # Configure the logger.
@@ -938,7 +938,7 @@ def _broadcast_cube_coord_data(cube, other, operation_name, dim=None):
         raise iris.exceptions.CoordinateMultiDimError(other)
 
     if other.has_bounds():
-        warnings.warn(
+        warn_once_at_level(
             "Using {!r} with a bounded coordinate is not well "
             "defined; ignoring bounds.".format(operation_name),
             category=iris.exceptions.IrisIgnoringBoundsWarning,

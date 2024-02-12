@@ -6,11 +6,10 @@
 
 from collections.abc import Iterator
 import itertools
-import warnings
 
 import numpy as np
 
-from iris.exceptions import IrisUserWarning
+from iris.exceptions import IrisUserWarning, warn_once_at_level
 
 __all__ = ["izip"]
 
@@ -155,7 +154,7 @@ def izip(*cubes, **kwargs):
                     "step." % coord_a.name()
                 )
             if coord_a != coord_b:
-                warnings.warn(
+                warn_once_at_level(
                     "Iterating over coordinate '%s' in step whose "
                     "definitions match but whose values "
                     "differ." % coord_a.name(),

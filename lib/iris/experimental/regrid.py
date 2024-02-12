@@ -18,7 +18,6 @@
 """
 import copy
 import functools
-import warnings
 
 import cartopy.crs as ccrs
 import numpy as np
@@ -37,7 +36,7 @@ from iris.analysis._regrid import (
 import iris.analysis.cartography
 import iris.coord_systems
 import iris.cube
-from iris.exceptions import IrisImpossibleUpdateWarning
+from iris.exceptions import IrisImpossibleUpdateWarning, warn_once_at_level
 from iris.util import _meshgrid
 
 wmsg = (
@@ -517,7 +516,7 @@ class _ProjectedUnstructuredRegridder:
                     "Cannot update aux_factory {!r} because of dropped"
                     " coordinates.".format(factory.name())
                 )
-                warnings.warn(msg, category=IrisImpossibleUpdateWarning)
+                warn_once_at_level(msg, category=IrisImpossibleUpdateWarning)
         return result
 
     def __call__(self, src_cube):

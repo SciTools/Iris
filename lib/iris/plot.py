@@ -10,7 +10,6 @@ See also: :ref:`matplotlib <matplotlib:users-guide-index>`.
 
 import collections
 import datetime
-import warnings
 
 import cartopy.crs as ccrs
 from cartopy.geodesic import Geodesic
@@ -30,7 +29,11 @@ import iris.analysis.cartography as cartography
 import iris.coord_systems
 import iris.coords
 import iris.cube
-from iris.exceptions import IrisError, IrisUnsupportedPlottingWarning
+from iris.exceptions import (
+    IrisError,
+    IrisUnsupportedPlottingWarning,
+    warn_once_at_level,
+)
 
 # Importing iris.palette to register the brewer palettes.
 import iris.palette
@@ -1913,13 +1916,13 @@ def animate(cube_iterator, plot_func, fig=None, **kwargs):
     if plot_func.__module__ not in supported:
         msg = 'Given plotting module "{}" may not be supported, intended ' "use: {}."
         msg = msg.format(plot_func.__module__, supported)
-        warnings.warn(msg, category=IrisUnsupportedPlottingWarning)
+        warn_once_at_level(msg, category=IrisUnsupportedPlottingWarning)
 
     supported = ["contour", "contourf", "pcolor", "pcolormesh"]
     if plot_func.__name__ not in supported:
         msg = 'Given plotting function "{}" may not be supported, intended ' "use: {}."
         msg = msg.format(plot_func.__name__, supported)
-        warnings.warn(msg, category=IrisUnsupportedPlottingWarning)
+        warn_once_at_level(msg, category=IrisUnsupportedPlottingWarning)
 
     # Determine plot range.
     vmin = kwargs.pop("vmin", min([cc.data.min() for cc in cubes]))

@@ -9,7 +9,6 @@ See also: https://pandas.pydata.org/
 """
 import datetime
 from itertools import chain, combinations
-import warnings
 
 import cf_units
 from cf_units import Unit
@@ -17,6 +16,8 @@ import cftime
 import numpy as np
 import numpy.ma as ma
 import pandas as pd
+
+from iris.exceptions import warn_once_at_level
 
 try:
     from pandas.core.indexes.datetimes import DatetimeIndex  # pandas >=0.20
@@ -430,7 +431,7 @@ def as_cubes(
         if columns_ignored:
             ignored_args = ", ".join([t[2] for t in class_arg_mapping])
             message = f"The input pandas_structure is a Series; ignoring arguments: {ignored_args} ."
-            warnings.warn(message, category=IrisIgnoringWarning)
+            warn_once_at_level(message, category=IrisIgnoringWarning)
         class_arg_mapping = []
 
     non_data_names = []
@@ -870,7 +871,7 @@ def as_data_frame(
             "'iris.FUTURE.pandas_ndim = True'. More info is in the "
             "documentation."
         )
-        warnings.warn(message, category=FutureWarning)
+        warn_once_at_level(message, category=FutureWarning)
 
         # The legacy behaviour.
         data = cube.data

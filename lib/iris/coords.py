@@ -11,7 +11,6 @@ import copy
 from functools import lru_cache
 from itertools import zip_longest
 import operator
-import warnings
 import zlib
 
 import dask.array as da
@@ -30,6 +29,7 @@ from iris.common import (
     metadata_manager_factory,
 )
 import iris.exceptions
+from iris.exceptions import warn_once_at_level
 import iris.time
 import iris.util
 
@@ -1974,7 +1974,7 @@ class Coord(_DimensionalMetadata):
         """
         if not self.has_bounds():
             if self.ndim == 1:
-                warnings.warn(
+                warn_once_at_level(
                     "Coordinate {!r} is not bounded, guessing "
                     "contiguous bounds.".format(self.name()),
                     category=iris.exceptions.IrisGuessBoundsWarning,
@@ -2136,7 +2136,7 @@ class Coord(_DimensionalMetadata):
                     "Collapsing a multi-dimensional coordinate. "
                     "Metadata may not be fully descriptive for {!r}."
                 )
-                warnings.warn(
+                warn_once_at_level(
                     msg.format(self.name()),
                     category=iris.exceptions.IrisVagueMetadataWarning,
                 )
@@ -2149,7 +2149,7 @@ class Coord(_DimensionalMetadata):
                         "Metadata may not be fully descriptive for {!r}. "
                         "Ignoring bounds."
                     )
-                    warnings.warn(
+                    warn_once_at_level(
                         msg.format(str(exc), self.name()),
                         category=iris.exceptions.IrisVagueMetadataWarning,
                     )
@@ -2160,7 +2160,7 @@ class Coord(_DimensionalMetadata):
                             "Collapsing a non-contiguous coordinate. "
                             "Metadata may not be fully descriptive for {!r}."
                         )
-                        warnings.warn(
+                        warn_once_at_level(
                             msg.format(self.name()),
                             category=iris.exceptions.IrisVagueMetadataWarning,
                         )

@@ -29,9 +29,9 @@ import configparser
 import contextlib
 import logging
 import os.path
-import warnings
 
 import iris.exceptions
+from iris.exceptions import warn_once_at_level
 
 
 def get_logger(name, datefmt=None, fmt=None, level=None, propagate=None, handler=True):
@@ -137,7 +137,7 @@ def get_dir_option(section, option, default=None):
                 "Ignoring config item {!r}:{!r} (section:option) as {!r}"
                 " is not a valid directory path."
             )
-            warnings.warn(
+            warn_once_at_level(
                 msg.format(section, option, c_path),
                 category=iris.exceptions.IrisIgnoringWarning,
             )
@@ -244,7 +244,7 @@ class NetCDF:
                     "Attempting to set invalid value {!r} for "
                     "attribute {!r}. Defaulting to {!r}."
                 )
-                warnings.warn(
+                warn_once_at_level(
                     wmsg.format(value, name, good_value),
                     category=iris.exceptions.IrisDefaultingWarning,
                 )

@@ -16,7 +16,6 @@ from copy import deepcopy
 from enum import Enum, auto
 import threading
 from typing import Union
-import warnings
 
 import numpy as np
 
@@ -35,6 +34,7 @@ import iris.config
 import iris.coord_systems
 import iris.coords
 import iris.exceptions
+from iris.exceptions import warn_once_at_level
 import iris.fileformats.cf
 from iris.fileformats.netcdf import _thread_safe_nc
 from iris.fileformats.netcdf.saver import _CF_ATTRS
@@ -413,7 +413,7 @@ def _load_aux_factory(engine, cube):
                 for coord, cf_var_name in engine.cube_parts["coordinates"]:
                     if cf_var_name == name:
                         return coord
-                warnings.warn(
+                warn_once_at_level(
                     "Unable to find coordinate for variable {!r}".format(name),
                     category=iris.exceptions.IrisFactoryCoordNotFoundWarning,
                 )
@@ -454,7 +454,7 @@ def _load_aux_factory(engine, cube):
                             "Ignoring atmosphere hybrid sigma pressure "
                             "scalar coordinate {!r} bounds.".format(coord_p0.name())
                         )
-                        warnings.warn(
+                        warn_once_at_level(
                             msg,
                             category=_WarnComboIgnoringBoundsLoad,
                         )
@@ -644,7 +644,7 @@ def load_cubes(file_sources, callback=None, constraints=None):
                 try:
                     _load_aux_factory(engine, cube)
                 except ValueError as e:
-                    warnings.warn(
+                    warn_once_at_level(
                         "{}".format(e),
                         category=iris.exceptions.IrisLoadWarning,
                     )
