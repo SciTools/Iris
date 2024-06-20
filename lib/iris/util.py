@@ -1789,7 +1789,7 @@ def find_discontiguities(cube, rel_tol=1e-5, abs_tol=1e-8):
 
     Parameters
     ----------
-    cube : `iris.cube.Cube`
+    cube : Cube
         The cube to be checked for discontinuities in its 'x' and 'y'
         coordinates. These coordinates must be 2D.
     rel_tol : float, default=1e-5
@@ -2131,7 +2131,7 @@ def mask_cube_from_shapefile(cube, shape, minimum_weight=0.0, in_place=False):
 
     Parameters
     ----------
-    cube : :class:`~iris.cube.Cube` object
+    cube : Cube object
         The `Cube` object to masked. Must be singular, rather than a `CubeList`.
     shape : Shapely.Geometry object
         A single `shape` of the area to remain unmasked on the `cube`.
@@ -2146,12 +2146,12 @@ def mask_cube_from_shapefile(cube, shape, minimum_weight=0.0, in_place=False):
 
     Returns
     -------
-    iris.Cube
+    Cube
         A masked version of the input cube, if in_place is False.
 
     See Also
     --------
-    :func:`~iris.util.mask_cube`
+    iris.util.mask_cube
         Mask any cells in the cube’s data array.
 
     Notes
