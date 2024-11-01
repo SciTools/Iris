@@ -65,6 +65,8 @@ def netcdf_variable(
         standard_name=standard_name,
         **{name: None for name in ugrid_identities},
     )
+    if bounds is None:
+        del ncvar.bounds
     return ncvar
 
 
@@ -91,9 +93,9 @@ class Test_translate__global_attributes(tests.IrisTest):
 
 class Test_translate__formula_terms(tests.IrisTest):
     def setUp(self):
-        self.delta = netcdf_variable("delta", "height", np.float64, bounds="delta_bnds")
+        self.delta = netcdf_variable("delta", "height", np.float64)
         self.delta_bnds = netcdf_variable("delta_bnds", "height bnds", np.float64)
-        self.sigma = netcdf_variable("sigma", "height", np.float64, bounds="sigma_bnds")
+        self.sigma = netcdf_variable("sigma", "height", np.float64)
         self.sigma_bnds = netcdf_variable("sigma_bnds", "height bnds", np.float64)
         self.orography = netcdf_variable("orography", "lat lon", np.float64)
         formula_terms = "a: delta b: sigma orog: orography"
@@ -172,9 +174,6 @@ class Test_translate__formula_terms(tests.IrisTest):
             self.assertEqual(set(group.keys()), set(aux_coordinates))
             for name in aux_coordinates:
                 self.assertIs(group[name].cf_data, getattr(self, name))
-            # Check all the auxiliary coordinates are formula terms.
-            formula_terms = cf_group.formula_terms
-            self.assertEqual(set(group.items()), set(formula_terms.items()))
             # Check there are three bounds.
             group = cf_group.bounds
             self.assertEqual(len(group), 3)
@@ -182,13 +181,24 @@ class Test_translate__formula_terms(tests.IrisTest):
             self.assertEqual(set(group.keys()), set(bounds))
             for name in bounds:
                 self.assertEqual(group[name].cf_data, getattr(self, name))
+            # Check the formula terms contains all expected terms
+            formula_terms = cf_group.formula_terms
+            expected_keys = ["delta", "sigma", "orography", "delta_bnds", "sigma_bnds"]
+            expected_group = {
+                k: v
+                for k, v in dict(
+                    **cf_group.auxiliary_coordinates, **cf_group.bounds
+                ).items()
+                if k in expected_keys
+            }
+            self.assertEqual(set(expected_group.items()), set(formula_terms.items()))
 
 
 class Test_build_cf_groups__formula_terms(tests.IrisTest):
     def setUp(self):
-        self.delta = netcdf_variable("delta", "height", np.float64, bounds="delta_bnds")
+        self.delta = netcdf_variable("delta", "height", np.float64)
         self.delta_bnds = netcdf_variable("delta_bnds", "height bnds", np.float64)
-        self.sigma = netcdf_variable("sigma", "height", np.float64, bounds="sigma_bnds")
+        self.sigma = netcdf_variable("sigma", "height", np.float64)
         self.sigma_bnds = netcdf_variable("sigma_bnds", "height bnds", np.float64)
         self.orography = netcdf_variable("orography", "lat lon", np.float64)
         formula_terms = "a: delta b: sigma orog: orography"
@@ -271,11 +281,9 @@ class Test_build_cf_groups__formula_terms(tests.IrisTest):
             self.assertEqual(len(group), 5)
             aux_coordinates = ["delta", "sigma", "orography", "x", "y"]
             self.assertEqual(set(group.keys()), set(aux_coordinates))
+            formula_terms = cf_group.formula_terms
             for name in aux_coordinates:
                 self.assertIs(group[name].cf_data, getattr(self, name))
-            # Check all the auxiliary coordinates are formula terms.
-            formula_terms = cf_group.formula_terms
-            self.assertTrue(set(formula_terms.items()).issubset(list(group.items())))
             # Check the terms by root.
             for name, term in zip(aux_coordinates, ["a", "b", "orog"]):
                 self.assertEqual(
@@ -292,6 +300,16 @@ class Test_build_cf_groups__formula_terms(tests.IrisTest):
                     aux_coord_group[name_bnds].cf_data,
                     getattr(self, name_bnds),
                 )
+            # Check the formula terms contains all expected terms
+            expected_keys = ["delta", "sigma", "orography", "delta_bnds", "sigma_bnds"]
+            expected_group = {
+                k: v
+                for k, v in dict(
+                    **cf_group.auxiliary_coordinates, **cf_group.bounds
+                ).items()
+                if k in expected_keys
+            }
+            self.assertEqual(set(expected_group.items()), set(formula_terms.items()))
 
     def test_promote_reference(self):
         with mock.patch(
